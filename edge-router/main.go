@@ -136,6 +136,18 @@ func makeHandler(c *http.Client, timeout time.Duration, upstreamURL string, auth
 
 				responseWritten = true
 				break
+			case http.StatusPaymentRequired:
+				w.WriteHeader(http.StatusPaymentRequired)
+				w.Write([]byte("Payment required"))
+
+				responseWritten = true
+				break
+			case http.StatusForbidden:
+				w.WriteHeader(http.StatusForbidden)
+				w.Write([]byte("Forbidden"))
+
+				responseWritten = true
+				break
 			case http.StatusTemporaryRedirect:
 
 				directTo, _ := url.Parse(location)
