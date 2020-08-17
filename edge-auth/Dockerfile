@@ -7,9 +7,6 @@ ENV GO111MODULE=off
 
 COPY vendor     vendor
 COPY handlers   handlers
-COPY static     static
-COPY template   template
-COPY provider   provider
 COPY main.go    .
 
 RUN go test -v \
@@ -23,8 +20,6 @@ RUN apk --no-cache add ca-certificates \
 
 WORKDIR /home/app/
 COPY --from=build /usr/bin/edge-auth /bin/
-COPY --from=build /go/src/github.com/openfaas/openfaas-cloud/edge-auth/static      static
-COPY --from=build /go/src/github.com/openfaas/openfaas-cloud/edge-auth/template    template
 
 USER app
 EXPOSE 8080
