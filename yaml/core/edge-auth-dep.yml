@@ -17,19 +17,6 @@ spec:
       labels:
         app: edge-auth
     spec:
-      volumes:
-        - name: jwt-private-key
-          secret:
-            secretName: jwt-private-key
-        - name: jwt-public-key
-          secret:
-            secretName: jwt-public-key
-        - name: of-client-secret
-          secret:
-            secretName: of-client-secret
-        - name: of-customers
-          secret:
-            secretName: of-customers
       containers:
       - name: edge-auth
         image: openfaas/edge-auth:0.7.1
@@ -44,59 +31,6 @@ spec:
         env:
           - name: port
             value: "8080"
-          - name: oauth_client_secret_path
-            value: "/var/secrets/of-client-secret/of-client-secret"
-          - name: public_key_path
-            value: "/var/secrets/public/key.pub"
-          - name: private_key_path
-            value: "/var/secrets/private/key"
-          - name: customers_path
-            value: "/var/secrets/of-customers/of-customers"
-# Update for your configuration:
-          - name: client_secret # this can also be provided via a secret named of-client-secret
-            value: ""
-          - name: client_id
-            value: ""
-          - name: oauth_provider_base_url
-            value: "" # If you want to use GitLab, put here address of it. For example: https://gitlab.domain.com
-          - name: oauth_provider
-            value: "github"
-# Local test config
-          # - name: external_redirect_domain
-          #   value: "http://auth.system.gw.io:8081"
-          # - name: cookie_root_domain
-          #   value: ".system.gw.io"
-
-# Community cluster config:
-          - name: external_redirect_domain
-            value: "https://auth.system.o6s.io"
-          - name: cookie_root_domain
-            value: ".system.o6s.io"
-
-# Config for setting the cookie to "secure", set this to true for HTTPS only OAuth
-          - name: secure_cookie
-            value: false
-
-# This is a default and can be overridden
-          - name: customers_url
-            value: "https://raw.githubusercontent.com/openfaas/openfaas-cloud/master/CUSTOMERS"
-
-          - name: write_debug
-            value: "false"
-
         ports:
         - containerPort: 8080
           protocol: TCP
-        volumeMounts:
-        - name: jwt-private-key
-          readOnly: true
-          mountPath: "/var/secrets/private/"
-        - name: jwt-public-key
-          readOnly: true
-          mountPath: "/var/secrets/public"
-        - name: of-client-secret
-          readOnly: true
-          mountPath: "/var/secrets/of-client-secret"
-        - name: of-customers
-          readOnly: true
-          mountPath: "/var/secrets/of-customers"
