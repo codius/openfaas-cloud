@@ -1,0 +1,96 @@
+name: Docker CI
+
+on:
+  push:
+    branches:
+    - '**'
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      push: ${{ steps.init.outputs.push }}
+      tag: ${{ steps.init.outputs.tag }}
+    steps:
+      - id: init
+        run: |
+          if [[ $GITHUB_EVENT_NAME == "push" ]]
+          then
+            PREFIX="refs/heads/"
+            BRANCH=${GITHUB_REF#"$PREFIX"}
+            if [[ $BRANCH == "master" ]]
+            then
+              echo "::set-output name=tag::latest"
+            else
+              echo "::set-output name=tag::$BRANCH"
+            fi
+            echo "::set-output name=push::true"
+          else
+            echo "::set-output name=push::false"
+            echo "::set-output name=tag::pr"
+          fi
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: init
+    strategy:
+      matrix:
+        svc: [
+          edge-auth
+        ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push ${{ matrix.svc }}
+        uses: docker/build-push-action@v2
+        with:
+          context: ./${{ matrix.svc }}
+          file: ./${{ matrix.svc }}/Dockerfile
+          push: ${{needs.init.outputs.push}}
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.svc }}:${{needs.init.outputs.tag}}
+  build-and-push-fns:
+    runs-on: ubuntu-latest
+    needs: init
+    strategy:
+      matrix:
+        include:
+        - fn: buildshiprun
+          buildDir: buildshiprun
+          image: of-buildshiprun
+        - fn: dashboard
+          buildDir: system-dashboard
+          image: of-cloud-dashboard
+          srcDir: dashboard
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bundle dashboard
+        run: make build-dist
+        working-directory: ./${{ matrix.srcDir }}
+        if: matrix.fn == 'dashboard'
+      - name: Install faas-cli
+        run: curl -sSL https://cli.openfaas.com | sh
+        working-directory: ./${{ matrix.srcDir }}
+      - name: Build function
+        run: ./faas-cli build -f ./stack.yml --shrinkwrap --filter "*${{ matrix.fn }}"
+        working-directory: ./${{ matrix.srcDir }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push ${{ matrix.fn }}
+        uses: docker/build-push-action@v2
+        with:
+          context: ./${{ matrix.srcDir }}/build/${{ matrix.buildDir }}
+          file: ./${{ matrix.srcDir }}/build/${{ matrix.buildDir }}/Dockerfile
+          push: ${{needs.init.outputs.push}}
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.image }}:${{needs.init.outputs.tag}}
