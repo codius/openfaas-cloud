@@ -1,0 +1,105 @@
+name: Docker CI
+
+on:
+  push:
+    branches:
+    - '**'
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/edge-auth
+          tag_with_ref: true
+          path: edge-auth
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/edge-router
+          tag_with_ref: true
+          path: edge-router
+  build-and-push-fn:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install faas-cli
+        run: curl -sSL https://cli.openfaas.com | sh
+      - name: Login to Registry
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+      - name: Build function(s)
+        run: ./faas-cli build -f ./stack.yml --filter buildshiprun
+      - name: Tag image(s)
+        run: |
+          if [[ $GITHUB_EVENT_NAME == "push" ]]
+          then
+            PREFIX="refs/heads/"
+            BRANCH=${GITHUB_REF#"$PREFIX"}
+            if [[ $BRANCH == "master" ]]
+            then
+              IMAGE_TAG=latest
+            else
+              IMAGE_TAG=$BRANCH
+            fi
+          else
+            PREFIX="refs/pull/"
+            IMAGE_TAG=pr-${GITHUB_REF#"$PREFIX"}
+            IMAGE_TAG=$(echo "$IMAGE_TAG" | tr / -)
+          fi
+          BUILDSHIPRUN=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep of-buildshiprun)
+          BUILDSHIPRUN_TAGGED=$DOCKER_USERNAME/of-buildshiprun:$IMAGE_TAG
+          docker tag $BUILDSHIPRUN $BUILDSHIPRUN_TAGGED
+          echo ::set-env name=BUILDSHIPRUN_TAGGED::$BUILDSHIPRUN_TAGGED
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      - name: Publish to Registry
+        run: |
+          docker push $BUILDSHIPRUN_TAGGED
+  build-and-push-dashboard:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: dashboard
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bundle dashboard
+        run: make
+      - name: Install faas-cli
+        run: curl -sSL https://cli.openfaas.com | sh
+      - name: Login to Registry
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+      - name: Build function
+        run: ./faas-cli build -f ./stack.yml
+      - name: Tag image(s)
+        run: |
+          if [[ $GITHUB_EVENT_NAME == "push" ]]
+          then
+            PREFIX="refs/heads/"
+            BRANCH=${GITHUB_REF#"$PREFIX"}
+            if [[ $BRANCH == "master" ]]
+            then
+              IMAGE_TAG=latest
+            else
+              IMAGE_TAG=$BRANCH
+            fi
+          else
+            PREFIX="refs/pull/"
+            IMAGE_TAG=pr-${GITHUB_REF#"$PREFIX"}
+            IMAGE_TAG=$(echo "$IMAGE_TAG" | tr / -)
+          fi
+          DASHBOARD=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep dashboard)
+          DASHBOARD_TAGGED=$DOCKER_USERNAME/of-cloud-dashboard:$IMAGE_TAG
+          docker tag $DASHBOARD $DASHBOARD_TAGGED
+          echo ::set-env name=DASHBOARD_TAGGED::$DASHBOARD_TAGGED
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      - name: Publish to Registry
+        run: docker push $DASHBOARD_TAGGED
