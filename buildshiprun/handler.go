@@ -205,6 +205,8 @@ func Handle(req []byte) string {
 
 		readOnlyRootFS := getReadOnlyRootFS()
 
+		profile := os.Getenv("profile")
+
 		registryAuth := getRegistryAuthSecret()
 
 		private := 0
@@ -232,6 +234,9 @@ func Handle(req []byte) string {
 
 		userAnnotations := buildAnnotations(annotationWhitelist, event.Annotations)
 		userAnnotations[sdk.FunctionLabelPrefix+"git-repo-url"] = event.RepoURL
+		if len(profile) > 0 {
+			userAnnotations["com.openfaas.profile"] = profile
+		}
 
 		deploy := &faasSDK.DeployFunctionSpec{
 			FunctionName: serviceValue,
@@ -263,6 +268,9 @@ func Handle(req []byte) string {
 			EnvVars:                event.Environment,
 			Secrets:                event.Secrets,
 			ReadOnlyRootFilesystem: readOnlyRootFS,
+		}
+		if len(profile) > 0 {
+			deploy.Labels["com.openfaas.profile"] = profile
 		}
 
 		deploy.FunctionResourceRequest.Limits.Memory = defaultMemoryLimit
