@@ -27,3 +27,31 @@ jobs:
           repository: ${{ secrets.DOCKER_USERNAME }}/edge-router
           tag_with_ref: true
           path: edge-router
+  build-and-push-fn:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install faas-cli
+        run: curl -sSL https://cli.openfaas.com | sh
+      - name: Login to Registry
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+      - name: Build function(s)
+        run: ./faas-cli build -f ./stack.yml --filter buildshiprun
+      - name: Tag image(s)
+        run: |
+          FAAS_IMAGE=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep of-buildshiprun)
+          if [[ $GITHUB_EVENT_NAME == "push" ]]
+          then
+            IMAGE_TAG=latest
+          else
+            PREFIX="refs/pull/"
+            IMAGE_TAG=pr-${GITHUB_REF#"$PREFIX"}
+            IMAGE_TAG=$(echo "$IMAGE_TAG" | tr / -)
+          fi
+          TAGGED_IMAGE=$DOCKER_USERNAME/of-buildshiprun:$IMAGE_TAG
+          docker tag $FAAS_IMAGE $TAGGED_IMAGE
+          echo ::set-env name=TAGGED_IMAGE::$TAGGED_IMAGE
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      - name: Publish to Registry
+        run: docker push $TAGGED_IMAGE
