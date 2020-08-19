@@ -33,6 +33,7 @@ environment:
   prometheus_host: prometheus.openfaas
   prometheus_port: 9090
   metrics_window: 60m
+  # profile: gvisor
 
 # Dockerfile language support
   enable_dockerfile_lang: false
