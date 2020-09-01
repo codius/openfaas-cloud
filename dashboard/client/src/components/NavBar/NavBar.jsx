@@ -97,10 +97,10 @@ class NavBarWithRouter extends Component {
             <NavItem>
               <NavLink
                 className="py-3 px-3 px-md-2"
-                href="https://github.com/openfaas/openfaas-cloud"
+                href={window.GITHUB_APP_URL}
               >
                 <FontAwesomeIcon icon={faGithub} className="mr-1" />
-                GitHub
+                GitHub App
               </NavLink>
             </NavItem>
           </Nav>
