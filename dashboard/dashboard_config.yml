@@ -12,3 +12,6 @@ environment:
   query_pretty_url: 'true'
   # Cookie root domain, set is using OAuth, used to remove a user's cookie
   cookie_root_domain: 'system.o6s.io'
+  # GitHub App public link
+  # see https://github.com/settings/apps/
+  # github_app_url: https://github.com/apps/my-ofc-app
