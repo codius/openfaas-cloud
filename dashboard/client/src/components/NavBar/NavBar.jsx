@@ -103,6 +103,14 @@ class NavBarWithRouter extends Component {
                 GitHub App
               </NavLink>
             </NavItem>
+            <NavItem>
+              <NavLink
+                className="py-3 px-3 px-md-2"
+                href="dist/pub-cert.pem"
+              >
+                Sealed Secrets
+              </NavLink>
+            </NavItem>
           </Nav>
           <Nav navbar className="ml-auto">
             { this.isLoggedIn() && this.createNavLink(
