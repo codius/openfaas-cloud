@@ -6,6 +6,7 @@ import { FunctionsOverviewPage } from './pages/FunctionsOverviewPage';
 import { FunctionLogPage } from "./pages/FunctionLogPage";
 import { FunctionDetailPage } from './pages/FunctionDetailPage';
 import { BuildLogPage } from './pages/BuildLogPage';
+import { HomePage } from './pages/HomePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { Breadcrumbs } from './components/Breadcrumbs';
 import { Footer } from './components/Footer';
@@ -37,9 +38,13 @@ export class App extends Component {
                 component={BuildLogPage}
               />
               <Route
-                  path="/:user/:functionName/function-log"
-                  component={FunctionLogPage}
-                />
+                path="/:user/:functionName/function-log"
+                component={FunctionLogPage}
+              />
+              <Route
+                path="/"
+                component={HomePage}
+              />
               <Route component={NotFoundPage} />
             </Switch>
           </div>
