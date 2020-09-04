@@ -15,3 +15,5 @@ environment:
   # GitHub App public link
   # see https://github.com/settings/apps/
   # github_app_url: https://github.com/apps/my-ofc-app
+  # Web monetization payment pointer
+  # payment_pointer: $system.my-ofc.com
