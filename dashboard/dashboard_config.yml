@@ -15,3 +15,7 @@ environment:
   # GitHub App public link
   # see https://github.com/settings/apps/
   github_app_url: https://github.com/apps/o6s-io
+  # Web monetization payment pointer
+  payment_pointer: $pay.o6s.io
+  # Receipt verifier url
+  receipts_url: https://pay.o6s.io/receipts

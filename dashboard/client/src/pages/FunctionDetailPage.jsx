@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Helmet } from "react-helmet";
 import queryString from 'query-string';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Card, CardHeader, CardBody } from 'reactstrap';
@@ -7,6 +8,7 @@ import { functionsApi } from '../api/functionsApi';
 import { FunctionDetailSummary } from '../components/FunctionDetailSummary';
 import { GetBadgeModal } from '../components/GetBadgeModal';
 import { ModalRunOnMyOF } from '../components/ModalRunOnMyOF';
+import { ReceiptSubmitter } from '../components/ReceiptSubmitter';
 
 export class FunctionDetailPage extends Component {
   constructor(props) {
@@ -75,7 +77,7 @@ export class FunctionDetailPage extends Component {
   }
 
   render() {
-    const { isLoading, fn, functionInvocationData } = this.state;
+    const { isLoading, fn, functionName, functionInvocationData, user } = this.state;
     let panelBody = (
       <FunctionDetailSummary
         fn={fn}
@@ -98,6 +100,10 @@ export class FunctionDetailPage extends Component {
 
     return (
       <Card outline color="success">
+        <Helmet>
+          <meta name="monetization" content={`${window.PAYMENT_POINTER}/${user}-${functionName}`} />
+        </Helmet>
+        <ReceiptSubmitter />
         <CardHeader className="bg-success color-success d-flex align-items-center justify-content-between">
           <div>Function Overview</div>
         </CardHeader>
