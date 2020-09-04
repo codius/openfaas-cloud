@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NavLink as NavLinkRouter, withRouter, matchPath } from 'react-router-dom';
+import { NavLink as NavLinkRouter, withRouter } from 'react-router-dom';
 import {
   Navbar,
   NavbarBrand,
@@ -31,10 +31,6 @@ class NavBarWithRouter extends Component {
   }
 
   createNavLink(currentPath, path, label, additionalClassName, icon = null, onClick = () => {}) {
-    if (!path) {
-      return null;
-    }
-
     const to = `/${path}`;
 
     const className = [
@@ -56,14 +52,6 @@ class NavBarWithRouter extends Component {
 
   render() {
     const { pathname } = this.props.history.location;
-    const match = matchPath(pathname, {
-      path: '/:user',
-      strict: false,
-    });
-    let user;
-    if (match && match.params) {
-      user = match.params.user;
-    }
 
     return (
       <Navbar
@@ -93,7 +81,7 @@ class NavBarWithRouter extends Component {
         <NavbarToggler className="mr-2" onClick={this.toggle} />
         <Collapse isOpen={this.state.isActive} navbar>
           <Nav navbar>
-            { this.createNavLink(pathname, user, 'Home') }
+            { this.createNavLink(pathname, '', 'Home') }
             { window.GITHUB_APP_URL &&
               <NavItem>
                 <NavLink
