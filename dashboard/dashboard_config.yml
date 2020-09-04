@@ -17,3 +17,7 @@ environment:
   # github_app_url: https://github.com/apps/o6s-io
   # Public URL for your GitLab instance
   # gitlab_url: https://gitlab.o6s.io/
+  # Web monetization payment pointer
+  payment_pointer: $pay.o6s.io
+  # Receipt verifier url
+  receipts_url: https://pay.o6s.io/receipts
