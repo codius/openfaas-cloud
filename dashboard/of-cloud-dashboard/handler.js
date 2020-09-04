@@ -76,6 +76,8 @@ module.exports = async (event, context) => {
     headers['Content-Type'] = 'application/json';
   } else if (/.*\.map/.test(path)) {
     headers['Content-Type'] = 'application/octet-stream';
+  } else if (/.*\.pem/.test(path)) {
+    headers['Content-Type'] = 'text/plain';
   }
 
   let contentPath = `${__dirname}${path}`;
