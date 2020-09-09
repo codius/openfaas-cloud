@@ -1,20 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: openfaas
+  name: gateway
   namespace: openfaas
 spec:
   policyTypes:
     - Ingress
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app: gateway
   ingress:
   - from:
-    - namespaceSelector:
+    - namespaceSelector: {}
+      podSelector:
         matchLabels:
-          role: openfaas-system
+          app.kubernetes.io/name: ingress-nginx
     - namespaceSelector:
         matchLabels:
           role: openfaas-fn
       podSelector:
         matchLabels:
-          role: openfaas-system
+          faas_function: audit-event

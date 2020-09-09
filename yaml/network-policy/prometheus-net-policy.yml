@@ -1,20 +1,19 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: openfaas
+  name: prometheus
   namespace: openfaas
 spec:
   policyTypes:
     - Ingress
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app: prometheus
   ingress:
   - from:
-    - namespaceSelector:
-        matchLabels:
-          role: openfaas-system
     - namespaceSelector:
         matchLabels:
           role: openfaas-fn
       podSelector:
         matchLabels:
-          role: openfaas-system
+          faas_function: metrics

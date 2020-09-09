@@ -26,7 +26,7 @@ type Spec struct {
 	TLS         []TLSSpec          `yaml:"tls,omitempty"`
 	Rules       []SpecRules        `yaml:"rules,flow,omitempty"`
 	PolicyTypes []string           `yaml:"policyTypes,flow,omitempty"`
-	PodSelector map[string]string  `yaml:"podSelector,omitempty"`
+	PodSelector MatchLabelSelector `yaml:"podSelector,omitempty"`
 	Ingress     []NetworkIngress   `yaml:"ingress,omitempty"`
 	Replicas    int                `yaml:"replicas"`
 	Selector    MatchLabelSelector `yaml:"selector,omitempty"`
