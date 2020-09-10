@@ -156,9 +156,11 @@ func buildFnNetworkPolicy(functionNamespace string) YamlSpec {
 func buildEdgeRouterNetworkPolicy(coreNamespace, functionNamespace string) YamlSpec {
 	podSelector := make(map[string]string)
 	nginxSelector := make(map[string]string)
+	legacySelector := make(map[string]string)
 
 	podSelector["app"] = "edge-router"
 	nginxSelector["app.kubernetes.io/name"] = "ingress-nginx"
+	legacySelector["app"] = "nginx-ingress"
 
 	return YamlSpec{
 		ApiVersion: "networking.k8s.io/v1",
@@ -180,6 +182,12 @@ func buildEdgeRouterNetworkPolicy(coreNamespace, functionNamespace string) YamlS
 							MatchLabels: nginxSelector,
 						},
 					},
+					{
+						Namespace: NamespaceSelector{},
+						Pod: MatchLabelSelector{
+							MatchLabels: legacySelector,
+						},
+					},
 				},
 			}},
 		},
@@ -189,11 +197,13 @@ func buildEdgeRouterNetworkPolicy(coreNamespace, functionNamespace string) YamlS
 func buildGatewayNetworkPolicy(coreNamespace, functionNamespace string) YamlSpec {
 	podSelector := make(map[string]string)
 	nginxSelector := make(map[string]string)
+	legacySelector := make(map[string]string)
 	auditEventSelector := make(map[string]string)
 	matchLabelsFunction := make(map[string]string)
 
 	podSelector["app"] = "gateway"
 	nginxSelector["app.kubernetes.io/name"] = "ingress-nginx"
+	legacySelector["app"] = "nginx-ingress"
 	auditEventSelector["faas_function"] = "audit-event"
 	matchLabelsFunction["role"] = functionNamespace
 
@@ -215,6 +225,12 @@ func buildGatewayNetworkPolicy(coreNamespace, functionNamespace string) YamlSpec
 						Namespace: NamespaceSelector{},
 						Pod: MatchLabelSelector{
 							MatchLabels: nginxSelector,
+						},
+					},
+					{
+						Namespace: NamespaceSelector{},
+						Pod: MatchLabelSelector{
+							MatchLabels: legacySelector,
 						},
 					},
 					{
