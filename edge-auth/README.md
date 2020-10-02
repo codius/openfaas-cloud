@@ -14,6 +14,7 @@ http://edge-auth:8080/q/?r=/function/system-dashboard
 Responses:
 
 * 200 - OK
+* 301 - Function balance insufficient, redirect to [web monetized](https://webmonetization.org/) function dashboard page
 * 401 - Restricted
 
 Cookies:
@@ -37,8 +38,6 @@ Contents (encoded JWT):
   "sub": "alexellis"
 }
 ```
-
-Please note - You need to be a public member of any Organisation that you wish to be able to see the dashboard and functions for.
 
 ## Building
 
