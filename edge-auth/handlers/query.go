@@ -1,43 +1,55 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
+	"os"
 	"strings"
 )
 
+// TODO: import me
+type FunctionBalance struct {
+	Balance     uint64 `json:"balance,string"`
+	Invocations uint64 `json:"remainingInvocations,string"`
+}
+
 // MakeQueryHandler returns whether a client can access a resource
-func MakeQueryHandler(config *Config, restrictedPrefix []string) func(http.ResponseWriter, *http.Request) {
+func MakeQueryHandler(config *Config, permitted []string, restrictedPrefix []string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
 
 		resource := query.Get("r")
 
 		status := http.StatusOK
+		var function string
 		if len(resource) == 0 {
 			status = http.StatusBadRequest
 		} else if hasPrefix(resource, restrictedPrefix) {
 			status = http.StatusUnauthorized
+		} else if !hasPrefix(resource, permitted) {
+			gatewayURL := os.Getenv("gateway_url")
+			function = strings.SplitN(strings.TrimPrefix(resource, "/function/"), "/", 2)[0]
+			invocations, err := getRemainingInvocations(function, gatewayURL)
+			if err != nil || invocations == 0 {
+				if err != nil {
+					log.Printf("Error getting remaining invocations for %s => %s", function, err)
+				} else {
+					log.Printf("No remaining invocations for %s", function)
+				}
+				status = http.StatusTemporaryRedirect
+			}
 		}
 
 		log.Printf("Validate %s => %d\n", resource, status)
 
 		if status == http.StatusTemporaryRedirect {
-			var redirect *url.URL
+			fnParts := strings.SplitN(function, "-", 2)
+			redirectUrl := fmt.Sprintf("%s/dashboard/%s/%s", config.ExternalRedirectDomain, fnParts[0], fnParts[1])
 
-			switch config.OAuthProvider {
-			case gitlabName:
-				redirect = buildGitLabURL(config)
-
-				break
-			case githubName:
-				redirect = buildGitHubURL(config, "", config.Scope)
-
-				break
-			}
-
-			http.Redirect(w, r, redirect.String(), http.StatusTemporaryRedirect)
+			http.Redirect(w, r, redirectUrl, http.StatusTemporaryRedirect)
 			return
 		}
 		w.WriteHeader(status)
@@ -52,4 +64,25 @@ func hasPrefix(resource string, prefixes []string) bool {
 		}
 	}
 	return false
+}
+
+func getRemainingInvocations(function string, gatewayURL string) (uint64, error) {
+	if resp, err := http.Get(gatewayURL + "/function/billing?function=" + function); err != nil {
+		return 0, err
+	} else if resp.Body == nil {
+		return 0, fmt.Errorf("no invocations for function: %s", function)
+	} else {
+		defer resp.Body.Close()
+
+		bodyBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return 0, err
+		}
+		// fmt.Printf("%s", string(bodyBytes))
+		balance := FunctionBalance{}
+		if err := json.Unmarshal(bodyBytes, &balance); err != nil {
+			return 0, err
+		}
+		return balance.Invocations, nil
+	}
 }
