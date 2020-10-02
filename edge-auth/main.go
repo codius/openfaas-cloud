@@ -97,6 +97,11 @@ func main() {
 		Debug:                  writeDebug,
 	}
 
+	permitted := []string{
+		"/function/system-dashboard",
+		"/function/system-github-event",
+	}
+
 	// Functions which make up the pipeline and which should not
 	// be exposed via public ingress.
 	restrictedPrefix := []string{
@@ -113,6 +118,7 @@ func main() {
 		"/function/echo",
 		"/function/metrics",
 		"/function/function-logs",
+		"/function/billing",
 
 		//AWS
 		"/function/register-image",
@@ -127,11 +133,15 @@ func main() {
 	router := http.NewServeMux()
 	router.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	router.HandleFunc("/", handlers.MakeHomepageHandler(config))
+	// router.HandleFunc("/", handlers.MakeHomepageHandler(config))
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK."))
+	})
 
-	router.HandleFunc("/q/", handlers.MakeQueryHandler(config, restrictedPrefix))
-	router.HandleFunc("/login/", handlers.MakeLoginHandler(config))
-	router.HandleFunc("/oauth2/", handlers.MakeOAuth2Handler(config))
+	router.HandleFunc("/q/", handlers.MakeQueryHandler(config, permitted, restrictedPrefix))
+	// router.HandleFunc("/login/", handlers.MakeLoginHandler(config))
+	// router.HandleFunc("/oauth2/", handlers.MakeOAuth2Handler(config))
 	router.HandleFunc("/healthz/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK."))
