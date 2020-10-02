@@ -1,0 +1,3 @@
+resources:
+- edge-auth-dep.yml
+- edge-auth-svc.yml
