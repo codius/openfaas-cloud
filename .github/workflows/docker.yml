@@ -26,80 +26,44 @@ jobs:
           repository: ${{ secrets.DOCKER_USERNAME }}/edge-router
           tag_with_ref: true
           path: edge-router
-  build-and-push-fn:
+  build-and-push-fns:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        fn: [
+          buildshiprun,
+          dashboard
+        ]
+        include:
+        - fn: dashboard
+          dir: dashboard
     steps:
       - uses: actions/checkout@v2
       - name: Install faas-cli
         run: curl -sSL https://cli.openfaas.com | sh
-      - name: Login to Registry
-        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-      - name: Build function(s)
-        run: ./faas-cli build -f ./stack.yml --filter buildshiprun
-      - name: Tag image(s)
-        run: |
-          if [[ $GITHUB_EVENT_NAME == "push" ]]
-          then
-            PREFIX="refs/heads/"
-            BRANCH=${GITHUB_REF#"$PREFIX"}
-            if [[ $BRANCH == "master" ]]
-            then
-              IMAGE_TAG=latest
-            else
-              IMAGE_TAG=$BRANCH
-            fi
-          else
-            PREFIX="refs/pull/"
-            IMAGE_TAG=pr-${GITHUB_REF#"$PREFIX"}
-            IMAGE_TAG=$(echo "$IMAGE_TAG" | tr / -)
-          fi
-          BUILDSHIPRUN=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep of-buildshiprun)
-          BUILDSHIPRUN_TAGGED=$DOCKER_USERNAME/of-buildshiprun:$IMAGE_TAG
-          docker tag $BUILDSHIPRUN $BUILDSHIPRUN_TAGGED
-          echo ::set-env name=BUILDSHIPRUN_TAGGED::$BUILDSHIPRUN_TAGGED
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      - name: Publish to Registry
-        run: |
-          docker push $BUILDSHIPRUN_TAGGED
-  build-and-push-dashboard:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: dashboard
-    steps:
-      - uses: actions/checkout@v2
-      - name: Bundle dashboard
-        run: make
-      - name: Install faas-cli
-        run: curl -sSL https://cli.openfaas.com | sh
+        working-directory: ./${{ matrix.dir }}
       - name: Login to Registry
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
       - name: Build function
-        run: ./faas-cli build -f ./stack.yml
-      - name: Tag image(s)
+        run: ./faas-cli build -f ./stack.yml --filter "*${{ matrix.fn }}"
+        working-directory: ./${{ matrix.dir }}
+      - name: Tag image
         run: |
-          if [[ $GITHUB_EVENT_NAME == "push" ]]
+          PREFIX="refs/heads/"
+          BRANCH=${GITHUB_REF#"$PREFIX"}
+          if [[ $BRANCH == "master" ]]
           then
-            PREFIX="refs/heads/"
-            BRANCH=${GITHUB_REF#"$PREFIX"}
-            if [[ $BRANCH == "master" ]]
-            then
-              IMAGE_TAG=latest
-            else
-              IMAGE_TAG=$BRANCH
-            fi
+            IMAGE_TAG=latest
           else
-            PREFIX="refs/pull/"
-            IMAGE_TAG=pr-${GITHUB_REF#"$PREFIX"}
-            IMAGE_TAG=$(echo "$IMAGE_TAG" | tr / -)
+            IMAGE_TAG=$BRANCH
           fi
-          DASHBOARD=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep dashboard)
-          DASHBOARD_TAGGED=$DOCKER_USERNAME/of-cloud-dashboard:$IMAGE_TAG
-          docker tag $DASHBOARD $DASHBOARD_TAGGED
-          echo ::set-env name=DASHBOARD_TAGGED::$DASHBOARD_TAGGED
+          echo ::set-env name=IMAGE_TAG::$IMAGE_TAG
+          OLD_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep ${{ matrix.fn }})
+          docker tag $OLD_TAG ${{ secrets.DOCKER_USERNAME }}/${{ matrix.fn }}:$IMAGE_TAG
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        if: github.event_name == 'push'
       - name: Publish to Registry
-        run: docker push $DASHBOARD_TAGGED
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.fn }}:$IMAGE_TAG
+        if: github.event_name == 'push'
