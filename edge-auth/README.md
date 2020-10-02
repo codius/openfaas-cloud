@@ -16,6 +16,7 @@ Responses:
 * 200 - OK
 * 301 - Cookie not present, redirect to given URL to create a valid cookie/login
 * 401 - Cookie present, but invalid
+* 402 - Insufficient function balance
 
 Cookies:
 
@@ -39,8 +40,6 @@ Contents (encoded JWT):
 }
 ```
 
-Please note - You need to be a public member of any Organisation that you wish to be able to see the dashboard and functions for.
-
 ## Building
 
 ```
@@ -52,7 +51,6 @@ make build push
 
 All environmental variables must be set and configured for the service whether running locally as a container, via Swarm or on Kubernetes.
 
-* `/system-dashboard` is protected by OAuth
 * All pipeline functions in OpenFaaS Cloud's stack.yml are blocked by default from all ingress such as `git-tar` and `buildshiprun`
 
 ### Generate a key/pair
