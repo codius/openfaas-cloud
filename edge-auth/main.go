@@ -103,6 +103,11 @@ func main() {
 		Debug:                  writeDebug,
 	}
 
+	permitted := []string{
+		"/function/system-dashboard",
+		"/function/system-github-event",
+	}
+
 	// Functions which make up the pipeline and which should not
 	// be exposed via public ingress.
 	restrictedPrefix := []string{
@@ -119,6 +124,7 @@ func main() {
 		"/function/echo",
 		"/function/metrics",
 		"/function/function-logs",
+		"/function/billing",
 
 		//AWS
 		"/function/register-image",
@@ -135,7 +141,7 @@ func main() {
 
 	router.HandleFunc("/", handlers.MakeHomepageHandler(config))
 
-	router.HandleFunc("/q/", handlers.MakeQueryHandler(config, restrictedPrefix))
+	router.HandleFunc("/q/", handlers.MakeQueryHandler(config, permitted, restrictedPrefix))
 	router.HandleFunc("/login/", handlers.MakeLoginHandler(config))
 	router.HandleFunc("/oauth2/", handlers.MakeOAuth2Handler(config))
 	router.HandleFunc("/healthz/", func(w http.ResponseWriter, r *http.Request) {
