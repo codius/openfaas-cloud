@@ -32,6 +32,11 @@ func MakeQueryHandler(config *Config, permitted []string, restrictedPrefix []str
 			gatewayURL := os.Getenv("gateway_url")
 			invocations, err := getRemainingInvocations(resource, gatewayURL)
 			if err != nil || invocations == 0 {
+				if err != nil {
+					log.Printf("Error getting remaining invocations for %s => %s", resource, err)
+				} else {
+					log.Printf("No remaining invocations for %s", resource)
+				}
 				status = http.StatusPaymentRequired
 			}
 		}
