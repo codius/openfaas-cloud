@@ -57,7 +57,7 @@ jobs:
           else
             IMAGE_TAG=$BRANCH
           fi
-          echo ::set-env name=IMAGE_TAG::$IMAGE_TAG
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           OLD_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep ${{ matrix.fn }})
           docker tag $OLD_TAG ${{ secrets.DOCKER_USERNAME }}/${{ matrix.fn }}:$IMAGE_TAG
         env:
