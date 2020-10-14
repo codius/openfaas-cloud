@@ -230,6 +230,7 @@ func Handle(req []byte) string {
 			"schedule",
 			"com.openfaas.health.http.path",
 			"com.openfaas.health.http.initialDelay",
+			"interledger.org/payment-pointer",
 		}
 
 		userAnnotations := buildAnnotations(annotationWhitelist, event.Annotations)
