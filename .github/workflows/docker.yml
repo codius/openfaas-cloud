@@ -61,31 +61,33 @@ jobs:
     needs: init
     strategy:
       matrix:
-        fn: [
-          buildshiprun,
-          dashboard
-        ]
         include:
+        - fn: buildshiprun
+          buildDir: buildshiprun
+          image: of-buildshiprun
         - fn: dashboard
-          dir: dashboard
+          buildDir: system-dashboard
+          image: of-cloud-dashboard
+          srcDir: dashboard
     steps:
       - uses: actions/checkout@v2
       - name: Install faas-cli
         run: curl -sSL https://cli.openfaas.com | sh
-        working-directory: ./${{ matrix.dir }}
-      - name: Login to Registry
-        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        working-directory: ./${{ matrix.srcDir }}
       - name: Build function
-        run: ./faas-cli build -f ./stack.yml --filter "*${{ matrix.fn }}"
-        working-directory: ./${{ matrix.dir }}
-      - name: Tag image
-        run: |
-          OLD_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep ${{ matrix.fn }})
-          docker tag $OLD_TAG ${{ secrets.DOCKER_USERNAME }}/${{ matrix.fn }}:${{needs.init.outputs.tag}}
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        if: needs.init.outputs.push == 'true'
-      - name: Publish to Registry
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/${{ matrix.fn }}:${{needs.init.outputs.tag}}
-        if: needs.init.outputs.push == 'true'
+        run: ./faas-cli build -f ./stack.yml --shrinkwrap --filter "*${{ matrix.fn }}"
+        working-directory: ./${{ matrix.srcDir }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push ${{ matrix.fn }}
+        uses: docker/build-push-action@v2
+        with:
+          context: ./${{ matrix.srcDir }}/build/${{ matrix.buildDir }}
+          file: ./${{ matrix.srcDir }}/build/${{ matrix.buildDir }}/Dockerfile
+          push: ${{needs.init.outputs.push}}
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.image }}:${{needs.init.outputs.tag}}
