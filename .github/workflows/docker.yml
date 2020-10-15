@@ -71,6 +71,10 @@ jobs:
           srcDir: dashboard
     steps:
       - uses: actions/checkout@v2
+      - name: Bundle dashboard
+        run: make build-dist
+        working-directory: ./${{ matrix.srcDir }}
+        if: matrix.fn == 'dashboard'
       - name: Install faas-cli
         run: curl -sSL https://cli.openfaas.com | sh
         working-directory: ./${{ matrix.srcDir }}
