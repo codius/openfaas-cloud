@@ -9,8 +9,8 @@ const genLogPath = ({ shortName, gitOwner, gitRepo, gitSha}) => (
   `${gitOwner}/${shortName}/function-log?repoPath=${gitOwner}/${gitRepo}&commitSHA=${gitSha}`
 );
 
-const genFnDetailPath = ({ shortName, gitOwner, gitRepo }) => (
-  `/${gitOwner}/${shortName}?repoPath=${gitOwner}/${gitRepo}`
+const genFnDetailPath = ({ shortName, gitOwner }) => (
+  `/${gitOwner}/${shortName}`
 );
 
 const genRepoUrl = ({ gitRepoURL, gitBranch }) => {

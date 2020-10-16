@@ -124,16 +124,16 @@ class FunctionsApi {
       .then(res => this.parseFunctionResponse(res, user))
       .then(data => {
         this.cachedFunctions = data.reduce((cache, fn) => {
-          cache[`${user}/${fn.gitOwner}/${fn.gitRepo}/${fn.shortName}`] = fn;
+          cache[`${user}/${fn.shortName}`] = fn;
           return cache;
         }, {});
         return data;
       });
   }
 
-  fetchFunction(user, gitRepo, fnShortname) {
+  fetchFunction(user, fnShortname) {
     return new Promise((resolve, reject) => {
-      const key = `${user}/${gitRepo}/${fnShortname}`;
+      const key = `${user}/${fnShortname}`;
 
       const cachedFn = this.cachedFunctions[key];
       if (cachedFn) {
