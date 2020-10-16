@@ -30,16 +30,7 @@ class BreadcrumbsWithRouter extends Component {
       } else {
         previousPath = acc[acc.length - 1].path;
       }
-
-      const q = queryString.parse(search);
-      let qs = '';
-      if (i === 1) {
-        // The function detail part needs a query param for the repoPath
-        // Currently the second part of the url is always the function name
-        // so we can always add the repoPath query
-        qs = `?repoPath=${q.repoPath}`;
-      }
-      acc.push({ name: p, path: `${previousPath}/${p}${qs}` });
+      acc.push({ name: p, path: `${previousPath}/${p}` });
       return acc;
     }, []);
   }

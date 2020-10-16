@@ -13,7 +13,6 @@ import { ReceiptSubmitter } from '../components/ReceiptSubmitter';
 export class FunctionDetailPage extends Component {
   constructor(props) {
     super(props);
-    const { repoPath } = queryString.parse(props.location.search);
     const { user, functionName } = props.match.params;
 
     this.handleShowBadgeModal = this.handleShowBadgeModal.bind(this);
@@ -27,7 +26,6 @@ export class FunctionDetailPage extends Component {
       fn: null,
       functionInvocationData: null,
       user,
-      repoPath,
       functionName,
       showBadgeModal: false,
       showRunOnMyOFModal: false
@@ -49,11 +47,11 @@ export class FunctionDetailPage extends Component {
   };
 
   componentDidMount() {
-    const { user, repoPath, functionName } = this.state;
+    const { user, functionName } = this.state;
 
     this.setState({ isLoading: true });
 
-    functionsApi.fetchFunction(user, repoPath, functionName).then(res => {
+    functionsApi.fetchFunction(user, functionName).then(res => {
       this.setState({ isLoading: false, fn: res });
     });
 
