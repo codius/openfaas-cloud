@@ -20,7 +20,7 @@ module.exports = async (event, context) => {
   let decodedCookie = decodeCookie(cookie);
   let organizations = parseOrganizations(decodedCookie);
 
-  if (/^\/api\/(list-functions|metrics|pipeline-log|function-logs).*/.test(path)) {
+  if (/^\/api\/(list-functions|metrics|pipeline-log|function-logs|billing).*/.test(path)) {
 
     // See if a user is trying to query functions they do not have permissions to view
     if (!isResourceInTokenClaims(path, query, decodedCookie, organizations)) {
