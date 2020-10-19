@@ -4,11 +4,11 @@ import {
   ListGroup,
   ListGroupItem,
   Nav,
-  NavLink,
-  Progress
+  NavLink
 } from 'reactstrap';
 
 import './FunctionInvocation.css';
+import { FunctionBalance } from '../FunctionBalance';
 
 const OPTIONS = {
   '1hr': '60m',
@@ -36,25 +36,15 @@ export class FunctionInvocation extends React.Component {
       );
     });
 
-    const total = success + failure;
-    const successPercent = (success / total) * 100;
-    const failurePercent = (failure / total) * 100;
-
     return (
       <div className="">
+        <FunctionBalance fn={this.props.fn} />
         <Nav className="d-flex justify-content-center">
           <span className="d-flex align-items-center mr-4 font-weight-bold">
             Period:
           </span>
           {navLinks}
         </Nav>
-        <div>
-          <Progress multi={true} className="mt-3 d-flex justify-content-center">
-            <Progress bar={true} color="success" value={successPercent} />
-            <Progress bar={true} color="danger" value={failurePercent} />
-          </Progress>
-          <span className="font-weight-bold">{total}</span> invocations
-        </div>
         <div className="mt-3 mx-1 row flex-row border">
           <div className="d-flex col-6 flex-column align-items-center border-right p-2">
             <h5 className="mt-1">

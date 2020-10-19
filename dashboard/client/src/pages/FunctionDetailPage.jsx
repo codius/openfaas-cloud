@@ -8,7 +8,6 @@ import { functionsApi } from '../api/functionsApi';
 import { FunctionDetailSummary } from '../components/FunctionDetailSummary';
 import { GetBadgeModal } from '../components/GetBadgeModal';
 import { ModalRunOnMyOF } from '../components/ModalRunOnMyOF';
-import { ReceiptSubmitter } from '../components/ReceiptSubmitter';
 
 export class FunctionDetailPage extends Component {
   constructor(props) {
@@ -101,7 +100,6 @@ export class FunctionDetailPage extends Component {
         <Helmet>
           <meta name="monetization" content={`${window.PAYMENT_POINTER}/${user}-${functionName}`} />
         </Helmet>
-        <ReceiptSubmitter />
         <CardHeader className="bg-success color-success d-flex align-items-center justify-content-between">
           <div>Function Overview</div>
         </CardHeader>
