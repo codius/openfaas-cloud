@@ -184,6 +184,7 @@ const FunctionDetailSummary = ({
         >
           {functionInvocationData ? (
             <FunctionInvocation
+              fn={fn}
               functionInvocationData={functionInvocationData}
               changeFunctionInvocationTimePeriod={
                 changeFunctionInvocationTimePeriod

@@ -152,6 +152,18 @@ class FunctionsApi {
     });
   }
 
+  async fetchFunctionBalance(functionName) {
+    try {
+      const url = `${this.apiBaseUrl}/billing?function=${functionName}`;
+      const result = await axios
+        .get(url);
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching function balance', functionName, error);
+      return null;
+    }
+  }
+
   async fetchFunctionInvocation(params) {
     const {
       user,
