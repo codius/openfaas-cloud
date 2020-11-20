@@ -2,8 +2,8 @@ name: publish
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - 'test-upstream-actions'
 
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
         id: get_repo_owner
         run: echo ::set-output name=repo_owner::$(echo ${{ github.event.repository.owner.login }} | tr '[:upper:]' '[:lower:]')
       - name: Deploy Stacks
-        run: TAG=${{ steps.get_tag.outputs.TAG }} REPO=${{ steps.get_repo_owner.outputs.repo_owner }} sh ./contrib/publish.sh
+        run: TAG=latest REPO=${{ steps.get_repo_owner.outputs.repo_owner }} sh ./contrib/publish.sh
 
   # Test building the non-cli Containers
   publish-containers:
@@ -44,9 +44,7 @@ jobs:
       matrix:
         go-version: [1.13.x]
         svc: [
-          edge-auth,
-          edge-router,
-          of-builder
+          edge-auth
         ]
     steps:
       - uses: actions/checkout@master
@@ -76,6 +74,5 @@ jobs:
           outputs: "type=registry,push=true"
           platforms: linux/amd64,linux/arm/v7,linux/arm64
           tags: |
-            ghcr.io/${{ steps.get_repo_owner.outputs.repo_owner }}/${{ matrix.svc }}:${{ steps.get_tag.outputs.TAG }}
             ghcr.io/${{ steps.get_repo_owner.outputs.repo_owner }}/${{ matrix.svc }}:${{ github.sha }}
             ghcr.io/${{ steps.get_repo_owner.outputs.repo_owner }}/${{ matrix.svc }}:latest
