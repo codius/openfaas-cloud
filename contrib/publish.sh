@@ -17,7 +17,7 @@ fi
 
 echo "Working folder: `pwd`"
 
-$CLI up --parallel=4 --skip-deploy
+$CLI up --parallel=4 --skip-deploy --filter "buildshiprun"
 HERE=`pwd`
 cd dashboard
 $CLI up -f stack.yml --skip-deploy
