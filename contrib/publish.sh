@@ -17,4 +17,4 @@ fi
 
 echo "Working folder: `pwd`"
 
-$CLI publish -f $STACKFILE --platforms linux/amd64,linux/arm64,linux/arm/v7
+$CLI publish -f $STACKFILE --platforms linux/amd64,linux/arm64,linux/arm/v7 --filter $FILTER
