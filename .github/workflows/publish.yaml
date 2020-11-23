@@ -34,7 +34,7 @@ jobs:
         run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
       - name: Get Repo Owner
         id: get_repo_owner
-        run: echo ::set-output name=repo_owner::$(echo ${{ github.event.repository.owner.login }} | tr '[:upper:]' '[:lower:]')
+        run: echo ::set-output name=repo_owner::$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
       - name: Deploy Stacks
         run: STACKFILE=${{ matrix.stack-file }} FILTER=buildshiprun TAG=latest REPO=${{ steps.get_repo_owner.outputs.repo_owner }} sh ./contrib/publish.sh
 
@@ -65,7 +65,7 @@ jobs:
         run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
       - name: Get Repo Owner
         id: get_repo_owner
-        run: echo ::set-output name=repo_owner::$(echo ${{ github.event.repository.owner.login }} | tr '[:upper:]' '[:lower:]')
+        run: echo ::set-output name=repo_owner::$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
       - name: Build Dist
         run: cd dashboard && make build-dist && cd ..
       - name: Deploy Stacks
