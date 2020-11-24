@@ -17,4 +17,8 @@ fi
 echo "Working folder: `pwd`"
 
 $CLI build --parallel=4
-$CLI build -f dashboard/stack.yml
+HERE=`pwd`
+cd dashboard
+make build-dist
+$CLI build
+cd $HERE
