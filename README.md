@@ -14,14 +14,6 @@ Features:
 * Sub-domain per user or organization with HTTPS
 * Runtime-logs for your functions
 
-The dashboard page for a user:
-
-![Dashboard](/docs/dashboard.png)
-
-The details page for a function:
-
-![Details page](/docs/details.png)
-
 ## Overview
 
 ### KubeCon video

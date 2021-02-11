@@ -97,9 +97,7 @@ func main() {
 		Debug:                  writeDebug,
 	}
 
-	protected := []string{
-		"/function/system-dashboard",
-	}
+	protected := []string{}
 
 	// Functions which make up the pipeline and which should not
 	// be exposed via public ingress.

@@ -41,20 +41,6 @@ jobs:
       - name: Run Build
         run: STACKFILE=${{ matrix.stack-file }} sh ./contrib/ci.sh
 
-  build-gateway:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@master
-        with:
-          fetch-depth: 1
-      - name: Make dist
-        run: cd dashboard && make build-dist && cd ..
-      - name: Run Build
-        run: STACKFILE=dashboard/stack.yml sh ./contrib/ci.sh
-
   # Test building the non-cli Containers
   build-containers:
     runs-on: ubuntu-latest
