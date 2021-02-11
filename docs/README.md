@@ -76,11 +76,8 @@ PAYLOAD_SECRET=$(head -c 12 /dev/urandom | shasum | cut -d' ' -f1)
 
 Kubernetes:
 
-> Note: The secret is needed in both namespaces due to the of-builder service using this to validate requests.
-
 ```bash
 kubectl create secret generic -n openfaas-fn payload-secret --from-literal payload-secret="$PAYLOAD_SECRET"
-kubectl create secret generic -n openfaas payload-secret --from-literal payload-secret="$PAYLOAD_SECRET"
 ```
 
 Swarm:
@@ -222,7 +219,7 @@ kubectl create secret generic \
   registry-secret --from-file=$HOME/.docker/config.json 
 ```
 
-Create of-builder, of-buildkit:
+Create edge-auth, edge-router:
 
 ```
 kubectl apply -f ./yaml/core
@@ -244,12 +241,6 @@ Create the secret for your registry
 
 ```
 cat $HOME/.docker/config.json | docker secret create registry-secret -
-```
-
-Create of-builder and of-buildkit:
-
-```
-./of-builder/deploy_swarm.sh
 ```
 
 ### Configure push repository, gateway URL and build branch

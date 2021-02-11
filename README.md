@@ -7,20 +7,12 @@ The Multi-user OpenFaaS Platform
 
 [![Build Status](https://github.com/openfaas/openfaas-cloud/workflows/build/badge.svg?branch=master)](https://github.com/openfaas/openfaas-cloud/actions)
 
-OpenFaaS Cloud introduces an automated build and management system for your Serverless functions with native integrations into your source-control management system whether that is GitHub or GitLab.
-
-With OpenFaaS Cloud functions are managed through typing `git push` which reduces the tooling and learning curve required to operate functions for your team. As soon as OpenFaaS Cloud receives a `push event` from `git` it will run through a build-workflow which clones your repo, builds a Docker image, pushes it to a registry and then deploys your functions to your cluster. Each user can access and monitor their functions through their personal dashboard.
-
 Features:
 
 * Portable - self-host on any cloud
-* Multi-user - use your GitHub/GitLab identity to log into your personal dashboard
-* Automates CI/CD triggered by `git push` (also known as GitOps)
-* Onboard new git repos with a single click by adding the *GitHub App* or a repository tag in *GitLab*
-* Immediate feedback on your personal dashboard and through GitHub Checks or GitLab Statuses
+* Multi-user
 * Sub-domain per user or organization with HTTPS
 * Runtime-logs for your functions
-* Fast, non-root image builds using [buildkit](https://github.com/moby/buildkit/) from Docker
 
 The dashboard page for a user:
 
@@ -32,10 +24,6 @@ The details page for a function:
 
 ## Overview
 
-![Conceptual diagram](/docs/ofc-github-conceptual.png)
-
-The high-level workflow for the OpenFaaS Cloud CI/CD pipeline.
-
 ### KubeCon video
 
 [![](http://img.youtube.com/vi/sD7hCwq3Gw0/maxresdefault.jpg)](https://www.youtube.com/watch?v=sD7hCwq3Gw0)
@@ -45,7 +33,6 @@ The high-level workflow for the OpenFaaS Cloud CI/CD pipeline.
 ### Blog posts
 
 * [Build your own OpenFaaS Cloud with AWS EKS](https://www.openfaas.com/blog/eks-openfaas-cloud-build-guide/)
-* [Introducing OpenFaaS Cloud with GitLab](https://www.openfaas.com/blog/openfaas-cloud-gitlab/)
 * [Introducing OpenFaaS Cloud](https://blog.alexellis.io/introducing-openfaas-cloud/)
 * [Sailing through the Serverless Ocean with Spotinst & OpenFaaS Cloud](https://spotinst.com/blog/sailing-through-the-serverless-ocean-with-openfaas-cloud/)
 

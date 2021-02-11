@@ -105,13 +105,9 @@ func main() {
 	// be exposed via public ingress.
 	restrictedPrefix := []string{
 		"/function/ofc-",
-		"/function/github-push",
-		"/function/git-tar",
 		"/function/buildshiprun",
 		"/function/garbage-collect",
-		"/function/github-status",
 		"/function/import-secrets",
-		"/function/pipeline-log",
 		"/function/list-functions",
 		"/function/audit-event",
 		"/function/echo",
@@ -120,10 +116,6 @@ func main() {
 
 		//AWS
 		"/function/register-image",
-
-		// GitLab
-		"/function/gitlab-status",
-		"/function/gitlab-push",
 	}
 
 	fs := http.FileServer(http.Dir("static"))

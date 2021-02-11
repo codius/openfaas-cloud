@@ -125,12 +125,3 @@ docker run \
 ### On Kubernetes
 
 Edit `yaml/core/edge-auth-dep.yml` as needed and apply that file.
-
-### GitLab integration
-
-If you want to integrate OpenFaaS Cloud with your self-managed GitLab you need to set env variables, where instead of ... you should put valid url to your self-hosted GitLab (for example: https://gitlab.domain.com):
-
-```
-oauth_provider="gitlab"
-oauth_provider_base_url="https://gitlab.domain.com"
-```

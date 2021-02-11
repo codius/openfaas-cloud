@@ -15,17 +15,6 @@ environment:
   basic_auth: true
   secret_mount_path: /var/openfaas/secrets
 
-# Container builder
-  repository_url: docker.io/ofcommunity/
-  push_repository_url: docker.io/ofcommunity/
-  builder_url: http://of-builder.openfaas:8080/
-
-# Logging
-  s3_url: cloud-minio.openfaas.svc.cluster.local:9000
-  s3_region: us-east-1
-  s3_tls: false
-  s3_bucket: pipeline
-
 # Function policy
   readonly_root_filesystem: true
   scaling_min_limit: 1
@@ -33,17 +22,3 @@ environment:
   prometheus_host: prometheus.openfaas
   prometheus_port: 9090
   metrics_window: 60m
-
-# Dockerfile language support
-  enable_dockerfile_lang: false
-
-  # Set the build branch to be used by ofc
-  build_branch: master
-
-# To use a shared Docker Hub account.
-#  repository_url: docker.io/ofcommunity/
-#  push_repository_url: docker.io/ofcommunity/
-
-# Private repo config
-# repository_url: 127.0.0.1:5000
-# push_repository_url: registry:5000
